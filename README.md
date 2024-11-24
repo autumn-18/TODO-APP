@@ -1,3 +1,7 @@
+Author- Shrasti Katiyar
+
+TO-DO Application is a beginner friendly project and gives us an in-depth knowledge about the frontend and backend parts of an application. This project has been developed using basic HTML, CSS and Javascript. It also provides an understanding of how the project grows through the development lifecycle.
+
 TODO APP - version 0
 
 1. first the user has to sign up in order to create an account in the in-memory user array.
@@ -15,8 +19,6 @@ the todo list associated to each user is empty everytime the user logs in. (as o
 
 6. logout button : when click the Logout button, it logs out of that session and displays you the login page again.
 
-
-**To add :**
 
 
 **Drawbacks:**
