@@ -1,0 +1,292 @@
+
+body
+{
+    /* background-color: rgb(162, 207, 228); */
+    display: flex;
+    justify-content: center;
+    font-family: "Roboto", sans-serif;
+
+}
+
+.app
+{
+    font-family: "Roboto", sans-serif;
+}
+
+h2
+{
+    margin-bottom: 30px;
+    font-size: 80px;
+    font-family: "Satisfy", cursive;
+}
+
+.app .buttons
+{
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    
+}
+
+.app
+{
+    margin-top: 10px;
+}
+
+.signup-login-block
+{
+    border-radius: 10px;
+    background-color: rgb(186, 233, 245);
+    padding: 60px 40px;
+    display: flex;
+    flex-direction:column;
+    gap: 20px;
+    padding-bottom: 20px;
+    
+}
+
+span
+{
+    font-size: 18px;
+    font-weight: 700;
+}
+
+input
+{
+    border-radius: 5px;
+    border: 0px solid black;
+    font-size: 15px;
+    padding: 5px;
+}
+
+#signup-button
+{
+    font-size: 18px;
+    font-weight: 700;
+    padding: 5px 50px;
+    margin-top: 20px;
+    width: 100%;
+    background-color: black;
+    color: whitesmoke;
+    border: 2px solid rgb(10, 1, 1);
+    border-radius: 20px;
+}
+
+#signup-button:active
+{
+    /* transition: transform 0.1s ease; */
+    transform: scale(1.02);
+}
+
+.signup-button-class
+{
+    margin-top: 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+}
+
+/*
+button
+{
+    font-size: 20px;
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+    border-radius: 5px;
+    border-style: none;
+    padding: 5px 10px;
+    background-color: rgb(12, 9, 44);
+    color: whitesmoke;;
+}
+
+button:hover
+{
+    transition: transform 0.1s ease;
+    transform: scale(1.05);
+}
+
+*/
+
+
+.todo-template
+{
+    /* background-color: rgb(199, 194, 194); */
+    width: 100%;
+    /* max-height: 100%; */
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: auto;
+    font-family: "Roboto", sans-serif;
+    
+}
+
+.header-section
+{
+    display: flex;
+    justify-content: space-between;
+
+}
+
+.header-section button
+{
+    margin-top: 20px;
+    margin-right: 50px;
+    margin-bottom: 5px;
+    border-radius: 10px;
+    padding: 5px 30px;
+    font-weight: 800;
+    font-family: "Roboto", sans-serif;
+    font-size: 18px;
+    background-color: black;
+    color: whitesmoke;
+    border: 2px solid rgb(10, 1, 1);
+
+}
+
+#logout-button:active
+{
+    /* transition: transform 0.1s ease; */
+    transform: scale(1.02);
+}
+
+.header-section h3
+{
+    font-family: "Satisfy", cursive;
+    /* background-color: blueviolet; */
+    font-size: 30px;
+    margin-top: 10px;
+    margin-left: 20px;
+    margin-bottom: 5px;
+}
+
+.todo-list
+{
+    /* display: flex; */
+    /* justify-content: center; */
+    width:50%;
+    height: calc(90%/1.1);
+    /* background-color: rgb(190, 138, 233); */
+    margin: 0 auto;
+    padding: 20px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    overflow: auto;
+
+    background-image: url(./images.jpeg);
+    background-size: cover;
+    opacity: 0.9;
+}
+
+#current-day
+{
+    margin: 3px;
+}
+
+#day
+{
+    font-size: 40px;
+    font-weight: 500;
+}
+
+#date
+{
+    font-weight: 400;
+}
+
+#current-day h4
+{
+    margin: 4px 0px;
+    color: black;
+}
+
+#newTodo
+{
+    margin: 30px 10px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+
+}
+
+#newTodo input
+{
+    padding: 5px 10px;
+    width: 70%;
+    
+}
+
+#newTodo input:focus
+{
+    border:none;
+    outline: none;
+}
+
+
+#add-button
+{
+    background-color: black;
+    color: white;
+    border:3px solid black;
+    border-radius: 10px;
+    padding: 0px 8px;
+    font-size: 30px;
+    font-weight: 700;
+}
+
+#add-button:active
+{
+    transform: scale(1.03);
+}
+
+#scheduledTaskList, #completedTaskList
+{
+    margin-top: 60px;
+    margin-left: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+#taskDiv
+{
+    display: flex;
+    gap: 10px;
+}
+
+.task-text-part
+{
+    display: flex;
+    gap: 10px;
+    background-color: rgb(226, 197, 220);
+    width: 80%;
+    padding: 0px 5px;
+    border-radius: 5px;
+    /* margin: 0 auto; */
+}
+
+#task-text-part p
+{
+    margin: 5px;
+}
+
+
+.task-delete-button
+{
+    background-color: rgb(48, 46, 48);
+    color: white;
+    border:1px solid rgb(48, 46, 48);
+    border-radius: 5px;
+    /* margin: 5px 2px; */
+    padding: 0px 10px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.task-delete-button:active
+{
+    transform: scale(1.05);
+}

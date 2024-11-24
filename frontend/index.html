@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TO-DO APP</title>
+    <!-- <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com"> -->
+    <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Satisfy&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="index.css">
+    <!-- adding axios module via CDN -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>   
+
+</head>
+<body>
+    <div>
+        <div class="header">
+            <h2>Schedule it !👊</h2>
+        </div>
+        <div class="app">
+            <div class="signup-login-block">
+                <div class="username-field">
+                    <span>Username : </span>
+                    <input id="username-input" type="text" placeholder="Enter username here">
+                </div>
+                
+                <div class="email-field">
+                    <span>Email : </span>
+                    <input id="email-input" type="text" placeholder="Enter email here">
+                </div>
+                <div class="password-field">
+                    <span>Password : </span>
+                    <input id="password-input" type="text" placeholder="Enter password here">
+                </div>
+                <div class="signup-button-class">
+                    <button id="signup-button" onclick="signup()">Sign up</button>
+                    <p>Already an account   <a href="javascript:void(0)" onclick="login()">Login</a></p>
+                </div>
+            </div>
+
+            <!-- the content inside this box changes as different routes are requested -->
+            <!-- display the signup or login detail entry box -->
+        </div>
+    </div>
+    <script src="index.js"></script>
+</body>
+</html>
