@@ -258,7 +258,7 @@ function displayScheduledTasks(scheduledTaskArray)
         // task delete button
         const taskDeleteBtnEle = document.createElement('button');
         taskDeleteBtnEle.innerHTML = "delete";
-        taskDeleteBtnEle.id = index;      // Each del button is associated to it's respective task's index in the array of documents
+        taskDeleteBtnEle.id = taskObj._id;      // Each del button is associated to it's respective task's index in the array of documents
         taskDeleteBtnEle.className = "task-delete-button";
         taskDeleteBtnEle.addEventListener('click', ()=>
         {
@@ -330,7 +330,7 @@ function displayCompletedTasks(completedTaskArray)
 async function deleteTask(deleteButtonId)
 {
     console.log("delete button clicked");
-    
+    console.log(deleteButtonId);
     const token = localStorage.getItem('token');
 
     const response = await axios.post('/deleteTask', {

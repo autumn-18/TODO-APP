@@ -10,6 +10,7 @@ mongoose.connect('mongodb+srv://autumn-18:12Bh1tpSTWpFHLXy@cluster0.xu9ks.mongod
 
 // import models from db.js
 const {UserModel, TaskModel} = require('./db');
+const { error } = require('console');
 
 app.use(express.json());   // middleware used to parse the incoming json objects in the request
 
@@ -123,6 +124,31 @@ app.post('/addTask', auth, async (req,res)=>
     {
         console.error(err);
 
+    }
+
+})
+
+app.post('/deleteTask',auth,async (req,res)=>
+{
+    const taskId = req.body.taskId;
+    const userId = req.body.userId;
+    console.log(taskId);
+
+    const DateAndTime = new Date();
+    const currentDate = DateAndTime.toISOString().split("T")[0];
+
+    try
+    {
+        // delete the taskId from the collection
+        await TaskModel.deleteOne({_id:taskId});    // find and delete the taskId that is sent in the req and then return the array of all task for that user to get displayed
+        const scheduledTaskArr = await TaskModel.find({userId:userId, date:currentDate});    
+        res.json({scheduledTaskArr});
+
+    }
+    catch(err)
+    {
+        console.error(err);
+        
     }
 
 })
