@@ -195,14 +195,13 @@ async function addTask()
     {
         const response = await axios.post('/addTask',
             {
-            "newTask" : newTask,
-            "token": token
+                'newTask' : newTask,
+                'token': token
             }
         )
     
-
     
-        if(response.data.scheduledTaskArr)
+        if(response.data.scheduledTaskArr)     // res.data  refers to the content inside {} in the json response
         {
             const scheduledTaskArray = response.data.scheduledTaskArr;
             //if a response is returned from the backend server, then perform DOM manipulation to add the new task div to the list
@@ -215,8 +214,6 @@ async function addTask()
 
     }
 
-
-    
 }
 
 
@@ -228,7 +225,7 @@ function displayScheduledTasks(scheduledTaskArray)
 
     const scheduledTaskEle = document.getElementById('scheduledTaskList');
 
-    //the innerHTML is made empty because everytime this function is called, first the scheduled task list is emptied and then the complete list is re-rendered
+    //the innerHTML is made empty because everytime this function is called, first the scheduled task list is emptied and then the complete list is re-rendered. Otherwise the new list is displayed below the previous list.
     scheduledTaskEle.innerHTML = "";
 
     const scheduledTaskHeading = document.createElement('h3');
@@ -237,7 +234,7 @@ function displayScheduledTasks(scheduledTaskArray)
     scheduledTaskEle.appendChild(scheduledTaskHeading);
 
 
-    scheduledTaskArray.forEach((task,index)=>
+    scheduledTaskArray.forEach((taskObj,index)=>
     {
         const singleTaskDivEle = document.createElement('div');
         singleTaskDivEle.id = "taskDiv";
@@ -247,13 +244,13 @@ function displayScheduledTasks(scheduledTaskArray)
         taskTextPart.className = "task-text-part";
         const taskCheckBox = document.createElement('input');
         taskCheckBox.type = 'checkbox';
-        taskCheckBox.id = index;
+        taskCheckBox.id = taskObj._id;         // the checkbox's id is the unique id of each task
         taskCheckBox.addEventListener('click',()=>
         {
-            shiftToCompletedTasks(taskCheckBox.id);
+            shiftToCompletedTasks(taskCheckBox.id);     // Not done yet
         })
         const taskText = document.createElement('p');
-        taskText.innerHTML = task;
+        taskText.innerHTML = taskObj.description;
 
         taskTextPart.appendChild(taskCheckBox);
         taskTextPart.appendChild(taskText);
@@ -261,11 +258,11 @@ function displayScheduledTasks(scheduledTaskArray)
         // task delete button
         const taskDeleteBtnEle = document.createElement('button');
         taskDeleteBtnEle.innerHTML = "delete";
-        taskDeleteBtnEle.id = index;      // Each del button is associated to it's respective task's index in the array
+        taskDeleteBtnEle.id = index;      // Each del button is associated to it's respective task's index in the array of documents
         taskDeleteBtnEle.className = "task-delete-button";
         taskDeleteBtnEle.addEventListener('click', ()=>
         {
-            deleteTask(taskDeleteBtnEle.id);
+            deleteTask(taskDeleteBtnEle.id);          // Not yet done
         });     // trigger the deleteTask() function when that delete button is clicked
 
         //append the taskTextPart and deleteBtn elements to the singleTaskDiv
