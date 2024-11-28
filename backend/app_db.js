@@ -95,14 +95,16 @@ app.post('/login', async (req,res)=>
 // all the upcoming requests after login will have the token attached with them for verification
 // an 'auth' middleware has to be called in all the route handlers to handle the authentication step.ie. token verification
 
+const DateAndTime = new Date();
+const currentDate = DateAndTime.toISOString().split("T")[0];
 
 // route handler for '/addTask' route
 app.post('/addTask', auth, async (req,res)=>
 {
     const newTask = req.body.newTask;
     const userId = req.body.userId;
-    const DateAndTime = new Date();
-    const currentDate = DateAndTime.toISOString().split("T")[0];   // this date is also in ISO format
+    // const DateAndTime = new Date();
+    // const currentDate = DateAndTime.toISOString().split("T")[0];   // this date is also in ISO format
 
     // when the token is verified and the decoded email is attached in the req. body, the task is added to the Task collection in the db.
     try
@@ -115,7 +117,7 @@ app.post('/addTask', auth, async (req,res)=>
             date : currentDate
         })
 
-        const scheduledTaskArr = await TaskModel.find({userId:userId, date:currentDate});    
+        const scheduledTaskArr = await TaskModel.find({userId:userId, date:currentDate, done:false});    
         // TaskModel.find() method returns an array of all those documents that have the desired userId
         // sending this array of documents as response
         res.json({scheduledTaskArr});      
@@ -134,14 +136,12 @@ app.post('/deleteTask',auth,async (req,res)=>
     const userId = req.body.userId;
     console.log(taskId);
 
-    const DateAndTime = new Date();
-    const currentDate = DateAndTime.toISOString().split("T")[0];
 
     try
     {
         // delete the taskId from the collection
         await TaskModel.deleteOne({_id:taskId});    // find and delete the taskId that is sent in the req and then return the array of all task for that user to get displayed
-        const scheduledTaskArr = await TaskModel.find({userId:userId, date:currentDate});    
+        const scheduledTaskArr = await TaskModel.find({userId:userId, date:currentDate, done:false});    
         res.json({scheduledTaskArr});
 
     }
@@ -150,6 +150,20 @@ app.post('/deleteTask',auth,async (req,res)=>
         console.error(err);
         
     }
+
+})
+
+app.post('/shiftTask', auth, async (req,res)=>
+{
+    const userId = req.body.userId;
+    const taskId = req.body.taskId;
+
+    await TaskModel.findByIdAndUpdate(taskId, {done:true}); // find the document by it's taskId and update it's 'done' field.
+    const completedTaskArr = await TaskModel.find({userId:userId, date:currentDate, done:true});
+    const scheduledTaskArr = await TaskModel.find({userId:userId, date:currentDate, done:false});    
+
+    
+    res.json({completedTaskArr, scheduledTaskArr});
 
 })
 
