@@ -1,12 +1,27 @@
-const express = require('express');
-const app = express();
-const path = require('path');
+const express           = require('express');
+const app               = express();
+const pathInstance      = require('path');
+const mongoose          = require('mongoose');
+const bcrypt            = require('bcryptjs');
+
+
+// importing 'dotenv' module in order to access the values enlisted in .env file.
+require('dotenv').config({path:pathInstance.join(__dirname,'../.env')});    // give the absolute path for the .env file (not it's relative path).
+const PORT = process.env.PORT;
+
 
 // import auth function and secret_key from auth.js
 const {auth, secret_key, jwt} = require('./auth');
 
-const mongoose = require('mongoose');
-mongoose.connect('mongodb+srv://autumn-18:12Bh1tpSTWpFHLXy@cluster0.xu9ks.mongodb.net/todo-app');
+// console.log(PORT);
+// console.log(secret_key);
+
+
+
+const dbServerPath = process.env.mongoDB_serverURL;
+mongoose.connect(dbServerPath);
+
+// console.log(dbServerPath);
 
 // import models from db.js
 const {UserModel, TaskModel} = require('./db');
@@ -16,7 +31,7 @@ app.use(express.json());   // middleware used to parse the incoming json objects
 
 
 // serve the frontend on the same url as backend. That means, to host the frontend on the same server as the backend. This is done to avoid any CORS violation
-app.use(express.static(path.join(__dirname, '../frontend')));
+app.use(express.static(pathInstance.join(__dirname, '../frontend')));
 
 
 // write route handlers for various requests
@@ -27,7 +42,20 @@ app.post('/signup', async (req, res)=>
     const email = req.body.email;
     const password = req.body.password;
     const username = req.body.name;          // we will be sending all the entered values cauz they are essential to keep a basic record of each user. email, pw, name
+
+    // User data verification
+    
+
+
     // when trying to signup, the new user should be added to the user collection in todo-app database
+
+    // 2 important things to be done:
+    //  1. hash the password    2. user data verification (done before hashing)
+
+    // hash the password obtained from the request body.
+    // Use bcrypt module for hashing
+    const hashedPassword = await bcrypt.hash(password, 10);  // the salt string is auto generate and added to the input password before getting hashed.
+
 
     try
     {
@@ -35,7 +63,7 @@ app.post('/signup', async (req, res)=>
             {
                 'email':email,
                 'username':username,
-                'password':password
+                'password':hashedPassword
             }
         )
 
@@ -168,8 +196,7 @@ app.post('/shiftTask', auth, async (req,res)=>
 })
 
 
-const port = 3000;
-app.listen(port, ()=>
+app.listen(PORT, ()=>
 {
     console.log("Server started");
 });

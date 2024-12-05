@@ -290,3 +290,15 @@ button:hover
 {
     transform: scale(1.05);
 }
+
+input.error
+{
+    border: 2px solid rgb(184, 13, 13);
+}
+
+.error-message {
+    color: rgb(184, 13, 13);
+    font-size: 12px;
+    margin-bottom: 10px;
+    margin-top: 5px;
+  }

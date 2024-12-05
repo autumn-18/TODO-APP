@@ -1,9 +1,12 @@
 // create a separate file for authentication logic and import it in app.js file
 
 // auth middleware is used to verify the token and decode the payload content from the token
+const pathInstance = require('path');
+require('dotenv').config({path: pathInstance.join(__dirname,'../.env')});
+
 let jwt = require('jsonwebtoken');
 const { UserModel } = require('./db');
-const secret_key = "FELIXFELICIS@hermione##dumbledore$$LILYPOTTER";  // secret_key only known to backend
+const secret_key = process.env.JWT_SECRET;  // secret_key only known to backend
 
 async function auth(req, res, next)
 {

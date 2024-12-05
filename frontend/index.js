@@ -1,4 +1,4 @@
-
+const { z } = window.Zod;
 // Event handler for Signup button
 // the template for signup details should appear when signup button is clicked
 async function signup()
@@ -7,37 +7,117 @@ async function signup()
     // check whether the entered email exists in the in-memory user array or not
 
     // fetch the username, email, password values
-    const username = document.getElementById('username-input').value;
-    const email = document.getElementById('email-input').value;
-    const password = document.getElementById('password-input').value;
+    const username = document.getElementById('username-input');
+    const email = document.getElementById('email-input');
+    const password = document.getElementById('password-input');
 
-    if(!username)
-        alert("Kindly enter username");
-    else if(!email)
-        alert("Kindly enter email-id");
-    else if(!password)
-        alert("Kindly enter password");
+    // fetch the divisions to display error messages for each
+    const usernameError = document.getElementById('username-error');
+    const emailError = document.getElementById('email-error');
+    const passwordError = document.getElementById('password-error');
 
-    else if(username!=null && email!=null && password!=null)
-    {
-    const response = await axios.post('/signup',
+    // Clear the previous error styles and messages
+    const allInputs = [username, email, password];
+    const allError = [usernameError, emailError, passwordError];
+
+    allInputs.forEach((input)=>{ input.classList.remove("error")});
+    allError.forEach((errorDiv)=>{ errorDiv.textContent = ""});
+    
+
+    
+    // create a Zod schema for the details
+    const userSchema = z.object(
         {
-            "username": username,
-            "email":email,
-            "password":password
+            email : z.string().email("Invalid email format"),
+
+            username : z.string().min(5, "Username must be atleast 5 characters long")
+            .max(10, "Username must not exceed 10 characters"),
+
+            password : z.string().regex(/[A-Z]/, "Password should contain atleast 1 uppercase alphabet")
+            .regex(/[a-z]/, "Password should contain atleast 1 lowercase alphabet")
+            .regex(/[0-9]/, "Password should contain atleast 1 numeric character")
+            .regex(/[^A-Za-z0-9]/, "Password should contain atleast 1 special character")
+            .regex(/^\S*$/, "Password should not contain blank spaces")
+
         }
     )
 
-    if(response.data.email)
+    // parse the entered data and compare it with the Zod schema
+    // Whatever feels like it might throw some error, write it inside the try{} block.
+    try
     {
-        alert("Yaee 🤩🎉😎\nSigned up successfully!!\nKindly Login into your account");
+        userSchema.parse(
+            {
+                email : email.value.trim(), 
+                username : username.value.trim(), 
+                password : password.value.trim()
+            });
+
+        // if validation successful
+        console.log("validation successful");
+
+        const response = await axios.post('/signup',
+        {
+            "username": username.value,
+            "email":email.value,
+            "password":password.value
+        }
+        )
+
+        if(response.data.email)
+            {
+                alert("Yaee 🤩🎉😎\nSigned up successfully!!\nKindly Login into your account");
+            }
+        
+            else
+            {
+                alert("⚠️⚠️Signup failed\nUser already exists!!");
+            }
+    }
+    catch(err)
+    {
+        if(err instanceof z.ZodError)
+        {
+            err.errors.forEach(({path, message})=>
+            {
+                const field = path[0];
+                const inputElement = document.getElementById(`${field}-input`);
+                const errorElement = document.getElementById(`${field}-error`);
+
+                // Highlight the invalid input
+                if (inputElement) 
+                    inputElement.classList.add("error");
+
+
+                // Display the error message
+                if (errorElement) 
+                    errorElement.textContent = message;
+            });
+        }
+
+        
+
     }
 
-    else
-    {
-        alert("⚠️⚠️Signup failed\nUser already exists!!");
-    }
-    }
+    // if(!username)
+    //     alert("Kindly enter username");
+    // else if(!email)
+    //     alert("Kindly enter email-id");
+    // else if(!password)
+    //     alert("Kindly enter password");
+
+    // else if(username!=null && email!=null && password!=null)
+    // {
+    // const response = await axios.post('/signup',
+    //     {
+    //         "username": username,
+    //         "email":email,
+    //         "password":password
+    //     }
+    // )
+
+    
+    // }
 
 }
 
@@ -302,7 +382,6 @@ function displayCompletedTasks(completedTaskArray)
         taskTextPart.className = "task-text-part";
         const taskCheckBox = document.createElement('input');
         taskCheckBox.type = 'checkbox';
-        // id for checkboxes are like 'task0', 'task1' and so on.....
         taskCheckBox.id = taskObj._id;
 
         const taskText = document.createElement('p');
@@ -314,12 +393,10 @@ function displayCompletedTasks(completedTaskArray)
         // task delete button
         const taskDeleteBtnEle = document.createElement('button');
         taskDeleteBtnEle.innerHTML = "delete";
-        taskDeleteBtnEle.id = taskObj._id;      // Each del button is associated to it's respective task's index in the array
-        //delete button id's are like '1', '2', '3' and so on.......
+        taskDeleteBtnEle.id = taskObj._id;      
         taskDeleteBtnEle.className = "task-delete-button";
 
         //append the taskTextPart and deleteBtn elements to the singleTaskDiv
-
         singleTaskDivEle.appendChild(taskTextPart);
         // singleTaskDivEle.appendChild(taskDeleteBtnEle);
 
@@ -355,6 +432,7 @@ async function deleteTask(deleteButtonId)
 async function shiftToCompletedTasks(checkBoxId)
 {
     console.log("Task checkbox clicked");
+
     // a token will be sent along the request for verification. It will be sent along all the requests.
     const token = localStorage.getItem('token');
 
