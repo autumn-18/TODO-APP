@@ -190,7 +190,7 @@ async function loadToDoPage()
     `
     <div class="todo-template">
         <div class="header-section">
-            <h3>Schedule it!👊</h3>
+            <h3>Daily Chronicles</h3>
             <button id="logout-button" onclick="logout()">LOGOUT</button>
             
         </div>
@@ -316,6 +316,7 @@ async function addTask()
             // add all the tasks from the user's scheduledTask array to the UI through DOM manipulation
             displayScheduledTasks(scheduledTaskArray);
             newTaskInputBox.value = "";
+            newTaskInputBox.focus();
 
         }
 
