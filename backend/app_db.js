@@ -44,7 +44,7 @@ app.post('/signup', async (req, res)=>
     const username = req.body.name;          // we will be sending all the entered values cauz they are essential to keep a basic record of each user. email, pw, name
 
     // User data verification
-    
+
 
 
     // when trying to signup, the new user should be added to the user collection in todo-app database
@@ -125,6 +125,25 @@ app.post('/login', async (req,res)=>
 
 const DateAndTime = new Date();
 const currentDate = DateAndTime.toISOString().split("T")[0];
+
+// route handler to display the already existing user data for that day
+app.post('/showUserData', auth, async (req,res)=>
+{
+    const userId = req.body.userId;
+
+    try
+    {
+        const scheduledTaskArr = await TaskModel.find({userId:userId, date:currentDate, done:false});    
+        const completedTaskArr = await TaskModel.find({userId:userId, date:currentDate, done:true});
+
+        res.json({completedTaskArr, scheduledTaskArr});
+
+    }
+    catch(err)
+    {
+        res.status(500).json({ message: "Internal server error" });
+    }
+})
 
 // route handler for '/addTask' route
 app.post('/addTask', auth, async (req,res)=>

@@ -1,9 +1,11 @@
 const { z } = window.Zod;
 // Event handler for Signup button
 // the template for signup details should appear when signup button is clicked
+// verify the entered details whether they match the required format and then signup the user.
 async function signup()
 {
-    // When signup button is clicked, fetch the values entered in username, email and password
+    // When signup button is clicked, fetch the values entered in username, email and password.
+    // Verify the entered user details.
     // check whether the entered email exists in the in-memory user array or not
 
     // fetch the username, email, password values
@@ -99,25 +101,6 @@ async function signup()
 
     }
 
-    // if(!username)
-    //     alert("Kindly enter username");
-    // else if(!email)
-    //     alert("Kindly enter email-id");
-    // else if(!password)
-    //     alert("Kindly enter password");
-
-    // else if(username!=null && email!=null && password!=null)
-    // {
-    // const response = await axios.post('/signup',
-    //     {
-    //         "username": username,
-    //         "email":email,
-    //         "password":password
-    //     }
-    // )
-
-    
-    // }
 
 }
 
@@ -180,8 +163,8 @@ async function handleLoginButton()
             localStorage.setItem('token', token);
             console.log("token stored in localStorage successfully");
 
-            //navigate to '/todo' route to access the TODO list
-            loadToDoPage();
+            //navigate to '/todo' route to access the TODO list for that user
+            await loadToDoPage();
             
         }
 
@@ -196,7 +179,7 @@ async function handleLoginButton()
 
 
 
-function loadToDoPage()
+async function loadToDoPage()
 {
     const body = document.querySelector('body');
     body.style.height = `${window.height}`;
@@ -218,7 +201,7 @@ function loadToDoPage()
             </div>
             <div id="todo-items">
                 <div id="newTodo">
-                    <input type="text" placeholder="Enter the new task">  
+                    <input id="taskInput" type="text" placeholder="Enter the new task">  
                     <button id="add-button" onclick="addTask()">+</button>
                 </div>
                 <div id="scheduledTaskList">
@@ -234,9 +217,25 @@ function loadToDoPage()
         </div>
     </div>
     `
+
     // set the current date
     setDayAndDate();
+    await showUserData();
 
+
+    
+    console.log("DOM loaded");
+    document.getElementById('taskInput').focus();
+    document.getElementById('taskInput').addEventListener('keydown', async (event)=>
+    {
+        if(event.key==='Enter')
+        {
+            console.log("Enter key pressed");
+            await addTask();
+        }
+
+    })
+    
 }
 
 
@@ -259,6 +258,34 @@ function setDayAndDate()
 
 }
 
+// Displays the already existing scheduled task list and completed task list for that user for that particular date
+async function showUserData()
+{
+    const token = localStorage.getItem('token');
+
+    const response = await axios.post('/showUserData', 
+        {
+            'token':token
+        }
+    )
+
+    try
+    {
+    if(response.data.scheduledTaskArr)
+    {
+        const scheduledTaskArray = response.data.scheduledTaskArr;
+        const completedTaskArray = response.data.completedTaskArr;
+
+        displayScheduledTasks(scheduledTaskArray);
+        displayCompletedTasks(completedTaskArray);
+    }
+    }
+    catch(err)
+    {
+        console.log("Unable to display user data");
+    }
+
+}
 
 // we need 3 main functions: addTask(), deleteTask(), updateTask()
 async function addTask()
