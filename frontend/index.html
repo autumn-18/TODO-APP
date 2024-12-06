@@ -10,28 +10,34 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Satisfy&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="index.css">
     <!-- adding axios module via CDN -->
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>   
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>  
+    <script src="https://cdn.jsdelivr.net/npm/zod@3.23.8/lib/index.umd.min.js"></script>
 
 </head>
 <body>
     <div>
         <div class="header">
-            <h2>Schedule it !👊</h2>
+            <h2>Daily Chronicles</h2>
         </div>
         <div class="app">
             <div class="signup-login-block">
                 <div class="username-field">
                     <span>Username : </span>
                     <input id="username-input" type="text" placeholder="Enter username here">
+                    <div class="error-message" id="username-error"></div>
                 </div>
                 
                 <div class="email-field">
                     <span>Email : </span>
                     <input id="email-input" type="text" placeholder="Enter email here">
+                    <div class="error-message" id="email-error"></div>
+
                 </div>
                 <div class="password-field">
                     <span>Password : </span>
                     <input id="password-input" type="text" placeholder="Enter password here">
+                    <div class="error-message" id="password-error"></div>
+
                 </div>
                 <div class="signup-button-class">
                     <button id="signup-button" onclick="signup()">Sign up</button>

@@ -1,43 +1,106 @@
-
+const { z } = window.Zod;
 // Event handler for Signup button
 // the template for signup details should appear when signup button is clicked
+// verify the entered details whether they match the required format and then signup the user.
 async function signup()
 {
-    // When signup button is clicked, fetch the values entered in username, email and password
+    // When signup button is clicked, fetch the values entered in username, email and password.
+    // Verify the entered user details.
     // check whether the entered email exists in the in-memory user array or not
 
     // fetch the username, email, password values
-    const username = document.getElementById('username-input').value;
-    const email = document.getElementById('email-input').value;
-    const password = document.getElementById('password-input').value;
+    const username = document.getElementById('username-input');
+    const email = document.getElementById('email-input');
+    const password = document.getElementById('password-input');
 
-    if(!username)
-        alert("Kindly enter username");
-    else if(!email)
-        alert("Kindly enter email-id");
-    else if(!password)
-        alert("Kindly enter password");
+    // fetch the divisions to display error messages for each
+    const usernameError = document.getElementById('username-error');
+    const emailError = document.getElementById('email-error');
+    const passwordError = document.getElementById('password-error');
 
-    else if(username!=null && email!=null && password!=null)
-    {
-    const response = await axios.post('/signup',
+    // Clear the previous error styles and messages
+    const allInputs = [username, email, password];
+    const allError = [usernameError, emailError, passwordError];
+
+    allInputs.forEach((input)=>{ input.classList.remove("error")});
+    allError.forEach((errorDiv)=>{ errorDiv.textContent = ""});
+    
+
+    
+    // create a Zod schema for the details
+    const userSchema = z.object(
         {
-            "username": username,
-            "email":email,
-            "password":password
+            email : z.string().email("Invalid email format"),
+
+            username : z.string().min(5, "Username must be atleast 5 characters long")
+            .max(10, "Username must not exceed 10 characters"),
+
+            password : z.string().regex(/[A-Z]/, "Password should contain atleast 1 uppercase alphabet")
+            .regex(/[a-z]/, "Password should contain atleast 1 lowercase alphabet")
+            .regex(/[0-9]/, "Password should contain atleast 1 numeric character")
+            .regex(/[^A-Za-z0-9]/, "Password should contain atleast 1 special character")
+            .regex(/^\S*$/, "Password should not contain blank spaces")
+
         }
     )
 
-    if(response.data.email)
+    // parse the entered data and compare it with the Zod schema
+    // Whatever feels like it might throw some error, write it inside the try{} block.
+    try
     {
-        alert("Yaee 🤩🎉😎\nSigned up successfully!!\nKindly Login into your account");
+        userSchema.parse(
+            {
+                email : email.value.trim(), 
+                username : username.value.trim(), 
+                password : password.value.trim()
+            });
+
+        // if validation successful
+        console.log("validation successful");
+
+        const response = await axios.post('/signup',
+        {
+            "username": username.value,
+            "email":email.value,
+            "password":password.value
+        }
+        )
+
+        if(response.data.email)
+            {
+                alert("Yaee 🤩🎉😎\nSigned up successfully!!\nKindly Login into your account");
+            }
+        
+            else
+            {
+                alert("⚠️⚠️Signup failed\nUser already exists!!");
+            }
+    }
+    catch(err)
+    {
+        if(err instanceof z.ZodError)
+        {
+            err.errors.forEach(({path, message})=>
+            {
+                const field = path[0];
+                const inputElement = document.getElementById(`${field}-input`);
+                const errorElement = document.getElementById(`${field}-error`);
+
+                // Highlight the invalid input
+                if (inputElement) 
+                    inputElement.classList.add("error");
+
+
+                // Display the error message
+                if (errorElement) 
+                    errorElement.textContent = message;
+            });
+        }
+
+        
+
     }
 
-    else
-    {
-        alert("⚠️⚠️Signup failed\nUser already exists!!");
-    }
-    }
 
 }
 
@@ -100,8 +163,8 @@ async function handleLoginButton()
             localStorage.setItem('token', token);
             console.log("token stored in localStorage successfully");
 
-            //navigate to '/todo' route to access the TODO list
-            loadToDoPage();
+            //navigate to '/todo' route to access the TODO list for that user
+            await loadToDoPage();
             
         }
 
@@ -116,7 +179,7 @@ async function handleLoginButton()
 
 
 
-function loadToDoPage()
+async function loadToDoPage()
 {
     const body = document.querySelector('body');
     body.style.height = `${window.height}`;
@@ -127,7 +190,7 @@ function loadToDoPage()
     `
     <div class="todo-template">
         <div class="header-section">
-            <h3>Schedule it!👊</h3>
+            <h3>Daily Chronicles</h3>
             <button id="logout-button" onclick="logout()">LOGOUT</button>
             
         </div>
@@ -138,7 +201,7 @@ function loadToDoPage()
             </div>
             <div id="todo-items">
                 <div id="newTodo">
-                    <input type="text" placeholder="Enter the new task">  
+                    <input id="taskInput" type="text" placeholder="Enter the new task">  
                     <button id="add-button" onclick="addTask()">+</button>
                 </div>
                 <div id="scheduledTaskList">
@@ -154,9 +217,25 @@ function loadToDoPage()
         </div>
     </div>
     `
+
     // set the current date
     setDayAndDate();
+    await showUserData();
 
+
+    
+    console.log("DOM loaded");
+    document.getElementById('taskInput').focus();
+    document.getElementById('taskInput').addEventListener('keydown', async (event)=>
+    {
+        if(event.key==='Enter')
+        {
+            console.log("Enter key pressed");
+            await addTask();
+        }
+
+    })
+    
 }
 
 
@@ -179,6 +258,34 @@ function setDayAndDate()
 
 }
 
+// Displays the already existing scheduled task list and completed task list for that user for that particular date
+async function showUserData()
+{
+    const token = localStorage.getItem('token');
+
+    const response = await axios.post('/showUserData', 
+        {
+            'token':token
+        }
+    )
+
+    try
+    {
+    if(response.data.scheduledTaskArr)
+    {
+        const scheduledTaskArray = response.data.scheduledTaskArr;
+        const completedTaskArray = response.data.completedTaskArr;
+
+        displayScheduledTasks(scheduledTaskArray);
+        displayCompletedTasks(completedTaskArray);
+    }
+    }
+    catch(err)
+    {
+        console.log("Unable to display user data");
+    }
+
+}
 
 // we need 3 main functions: addTask(), deleteTask(), updateTask()
 async function addTask()
@@ -195,14 +302,13 @@ async function addTask()
     {
         const response = await axios.post('/addTask',
             {
-            "newTask" : newTask,
-            "token": token
+                'newTask' : newTask,
+                'token': token
             }
         )
     
-
     
-        if(response.data.scheduledTaskArr)
+        if(response.data.scheduledTaskArr)     // res.data  refers to the content inside {} in the json response
         {
             const scheduledTaskArray = response.data.scheduledTaskArr;
             //if a response is returned from the backend server, then perform DOM manipulation to add the new task div to the list
@@ -210,13 +316,13 @@ async function addTask()
             // add all the tasks from the user's scheduledTask array to the UI through DOM manipulation
             displayScheduledTasks(scheduledTaskArray);
             newTaskInputBox.value = "";
+            // the blink cursor always remains on the input field. So that the user can type whenever they want.
+            newTaskInputBox.focus();
 
         }
 
     }
 
-
-    
 }
 
 
@@ -228,54 +334,61 @@ function displayScheduledTasks(scheduledTaskArray)
 
     const scheduledTaskEle = document.getElementById('scheduledTaskList');
 
-    //the innerHTML is made empty because everytime this function is called, first the scheduled task list is emptied and then the complete list is re-rendered
+    //the innerHTML is made empty because everytime this function is called, first the scheduled task list is emptied and then the complete list is re-rendered. Otherwise the new list is displayed below the previous list.
     scheduledTaskEle.innerHTML = "";
 
-    const scheduledTaskHeading = document.createElement('h3');
-    scheduledTaskHeading.textContent = "Scheduled Tasks";
+    if(scheduledTaskArray.length==0)
+        scheduledTaskEle.innerHTML = "";
 
-    scheduledTaskEle.appendChild(scheduledTaskHeading);
-
-
-    scheduledTaskArray.forEach((task,index)=>
+    else
     {
-        const singleTaskDivEle = document.createElement('div');
-        singleTaskDivEle.id = "taskDiv";
+        const scheduledTaskHeading = document.createElement('h3');
+        scheduledTaskHeading.textContent = "Scheduled Tasks";
 
-        //task text part component
-        const taskTextPart = document.createElement('div');
-        taskTextPart.className = "task-text-part";
-        const taskCheckBox = document.createElement('input');
-        taskCheckBox.type = 'checkbox';
-        taskCheckBox.id = index;
-        taskCheckBox.addEventListener('click',()=>
+        scheduledTaskEle.appendChild(scheduledTaskHeading);
+
+        scheduledTaskArray.forEach((taskObj,index)=>
         {
-            shiftToCompletedTasks(taskCheckBox.id);
-        })
-        const taskText = document.createElement('p');
-        taskText.innerHTML = task;
+        
+            const singleTaskDivEle = document.createElement('div');
+            singleTaskDivEle.id = "taskDiv";
 
-        taskTextPart.appendChild(taskCheckBox);
-        taskTextPart.appendChild(taskText);
+            //task text part component
+            const taskTextPart = document.createElement('div');
+            taskTextPart.className = "task-text-part";
+            const taskCheckBox = document.createElement('input');
+            taskCheckBox.type = 'checkbox';
+            taskCheckBox.id = taskObj._id;          // the checkbox's id is the unique id of each task
+            taskCheckBox.addEventListener('click',()=>
+            {
+                shiftToCompletedTasks(taskCheckBox.id);     // Done
+            });
+            const taskText = document.createElement('p');
+            taskText.innerHTML = taskObj.description;
 
-        // task delete button
-        const taskDeleteBtnEle = document.createElement('button');
-        taskDeleteBtnEle.innerHTML = "delete";
-        taskDeleteBtnEle.id = index;      // Each del button is associated to it's respective task's index in the array
-        taskDeleteBtnEle.className = "task-delete-button";
-        taskDeleteBtnEle.addEventListener('click', ()=>
-        {
-            deleteTask(taskDeleteBtnEle.id);
-        });     // trigger the deleteTask() function when that delete button is clicked
+            taskTextPart.appendChild(taskCheckBox);
+            taskTextPart.appendChild(taskText);
 
-        //append the taskTextPart and deleteBtn elements to the singleTaskDiv
+            // task delete button
+            const taskDeleteBtnEle = document.createElement('button');
+            taskDeleteBtnEle.innerHTML = "delete";
+            taskDeleteBtnEle.id = taskObj._id;      // Each del button is associated to it's respective task's index in the array of documents
+            taskDeleteBtnEle.className = "task-delete-button";
+            taskDeleteBtnEle.addEventListener('click', ()=>
+            {
+                // trigger the deleteTask() function when that delete button is clicked
+                deleteTask(taskDeleteBtnEle.id);          // Done
+            });     
 
-        singleTaskDivEle.appendChild(taskTextPart);
-        singleTaskDivEle.appendChild(taskDeleteBtnEle);
+            
+            //append the taskTextPart and deleteBtn elements to the singleTaskDiv
+            singleTaskDivEle.appendChild(taskTextPart);
+            singleTaskDivEle.appendChild(taskDeleteBtnEle);
 
-        scheduledTaskEle.appendChild(singleTaskDivEle);
+            scheduledTaskEle.appendChild(singleTaskDivEle);
 
-    })
+        });
+    }
 
 }
 
@@ -286,46 +399,49 @@ function displayCompletedTasks(completedTaskArray)
     //the innerHTML is made empty because everytime this function is called, first the scheduled task list is emptied and then the complete list is re-rendered
     completeTaskEle.innerHTML = "";
 
-    const completedTaskHeading = document.createElement('h3');
-    completedTaskHeading.textContent = "Completed Tasks";
+    if(completedTaskArray.length==0)
+        completeTaskEle.innerHTML = "";
 
-    completeTaskEle.appendChild(completedTaskHeading);
+    else
+    {
+        const completedTaskHeading = document.createElement('h3');
+        completedTaskHeading.textContent = "Completed Tasks";
+
+        completeTaskEle.appendChild(completedTaskHeading);
 
     
-    completedTaskArray.forEach((task,index)=>
-    {
-        const singleTaskDivEle = document.createElement('div');
-        singleTaskDivEle.id = "taskDiv";
+        completedTaskArray.forEach((taskObj,index)=>
+        {
+            const singleTaskDivEle = document.createElement('div');
+            singleTaskDivEle.id = "taskDiv";
 
-        //task text part component
-        const taskTextPart = document.createElement('div');
-        taskTextPart.className = "task-text-part";
-        const taskCheckBox = document.createElement('input');
-        taskCheckBox.type = 'checkbox';
-        // id for checkboxes are like 'task0', 'task1' and so on.....
-        taskCheckBox.id = 'task'+index;
+            //task text part component
+            const taskTextPart = document.createElement('div');
+            taskTextPart.className = "task-text-part";
+            const taskCheckBox = document.createElement('input');
+            taskCheckBox.type = 'checkbox';
+            taskCheckBox.id = taskObj._id;
 
-        const taskText = document.createElement('p');
-        taskText.innerHTML = task;
+            const taskText = document.createElement('p');
+            taskText.innerHTML = taskObj.description;
 
-        taskTextPart.appendChild(taskCheckBox);
-        taskTextPart.appendChild(taskText);
+            taskTextPart.appendChild(taskCheckBox);
+            taskTextPart.appendChild(taskText);
 
-        // task delete button
-        const taskDeleteBtnEle = document.createElement('button');
-        taskDeleteBtnEle.innerHTML = "delete";
-        taskDeleteBtnEle.id = index;      // Each del button is associated to it's respective task's index in the array
-        //delete button id's are like '1', '2', '3' and so on.......
-        taskDeleteBtnEle.className = "task-delete-button";
+            // task delete button
+            const taskDeleteBtnEle = document.createElement('button');
+            taskDeleteBtnEle.innerHTML = "delete";
+            taskDeleteBtnEle.id = taskObj._id;      
+            taskDeleteBtnEle.className = "task-delete-button";
 
-        //append the taskTextPart and deleteBtn elements to the singleTaskDiv
+            //append the taskTextPart and deleteBtn elements to the singleTaskDiv
+            singleTaskDivEle.appendChild(taskTextPart);
+            // singleTaskDivEle.appendChild(taskDeleteBtnEle);
 
-        singleTaskDivEle.appendChild(taskTextPart);
-        // singleTaskDivEle.appendChild(taskDeleteBtnEle);
+            completeTaskEle.appendChild(singleTaskDivEle);
 
-        completeTaskEle.appendChild(singleTaskDivEle);
-
-    })
+        })
+    }
 }
 
 
@@ -333,7 +449,7 @@ function displayCompletedTasks(completedTaskArray)
 async function deleteTask(deleteButtonId)
 {
     console.log("delete button clicked");
-    
+    console.log(deleteButtonId);
     const token = localStorage.getItem('token');
 
     const response = await axios.post('/deleteTask', {
@@ -355,6 +471,7 @@ async function deleteTask(deleteButtonId)
 async function shiftToCompletedTasks(checkBoxId)
 {
     console.log("Task checkbox clicked");
+
     // a token will be sent along the request for verification. It will be sent along all the requests.
     const token = localStorage.getItem('token');
 
@@ -371,7 +488,6 @@ async function shiftToCompletedTasks(checkBoxId)
         displayScheduledTasks(scheduledTaskArray);
         displayCompletedTasks(completedTaskArray);
         
-
     }
 }
 

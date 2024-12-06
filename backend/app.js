@@ -4,7 +4,7 @@ const app = express();
 const path = require('path');
 
 const jwt = require('jsonwebtoken');
-const secret_key = "FELIXFELICIS@hermione#dumbledore$$lily";   //secret_key only known to backend. Not to any user
+const secret_key = "FELIXFELICIS@hermione#dumbledore$$LILYPOTTER";   //secret_key only known to backend. Not to any user
 
 // host the frontend on the same server as backend
 app.use(express.static(path.join(__dirname, '../frontend')));
