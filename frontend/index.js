@@ -316,6 +316,7 @@ async function addTask()
             // add all the tasks from the user's scheduledTask array to the UI through DOM manipulation
             displayScheduledTasks(scheduledTaskArray);
             newTaskInputBox.value = "";
+            // the blink cursor always remains on the input field. So that the user can type whenever they want.
             newTaskInputBox.focus();
 
         }
@@ -336,15 +337,19 @@ function displayScheduledTasks(scheduledTaskArray)
     //the innerHTML is made empty because everytime this function is called, first the scheduled task list is emptied and then the complete list is re-rendered. Otherwise the new list is displayed below the previous list.
     scheduledTaskEle.innerHTML = "";
 
-    const scheduledTaskHeading = document.createElement('h3');
-    scheduledTaskHeading.textContent = "Scheduled Tasks";
+    if(scheduledTaskArray.length==0)
+        scheduledTaskEle.innerHTML = "";
 
-    scheduledTaskEle.appendChild(scheduledTaskHeading);
-
-    scheduledTaskArray.forEach((taskObj,index)=>
+    else
     {
-        // if(taskObj.done == false)    // if the 'done' field for a task is false , then display it in the scheduled task list.
-        // {
+        const scheduledTaskHeading = document.createElement('h3');
+        scheduledTaskHeading.textContent = "Scheduled Tasks";
+
+        scheduledTaskEle.appendChild(scheduledTaskHeading);
+
+        scheduledTaskArray.forEach((taskObj,index)=>
+        {
+        
             const singleTaskDivEle = document.createElement('div');
             singleTaskDivEle.id = "taskDiv";
 
@@ -357,7 +362,7 @@ function displayScheduledTasks(scheduledTaskArray)
             taskCheckBox.addEventListener('click',()=>
             {
                 shiftToCompletedTasks(taskCheckBox.id);     // Done
-            })
+            });
             const taskText = document.createElement('p');
             taskText.innerHTML = taskObj.description;
 
@@ -381,9 +386,9 @@ function displayScheduledTasks(scheduledTaskArray)
             singleTaskDivEle.appendChild(taskDeleteBtnEle);
 
             scheduledTaskEle.appendChild(singleTaskDivEle);
-        // }
 
-    })
+        });
+    }
 
 }
 
@@ -394,43 +399,49 @@ function displayCompletedTasks(completedTaskArray)
     //the innerHTML is made empty because everytime this function is called, first the scheduled task list is emptied and then the complete list is re-rendered
     completeTaskEle.innerHTML = "";
 
-    const completedTaskHeading = document.createElement('h3');
-    completedTaskHeading.textContent = "Completed Tasks";
+    if(completedTaskArray.length==0)
+        completeTaskEle.innerHTML = "";
 
-    completeTaskEle.appendChild(completedTaskHeading);
+    else
+    {
+        const completedTaskHeading = document.createElement('h3');
+        completedTaskHeading.textContent = "Completed Tasks";
+
+        completeTaskEle.appendChild(completedTaskHeading);
 
     
-    completedTaskArray.forEach((taskObj,index)=>
-    {
-        const singleTaskDivEle = document.createElement('div');
-        singleTaskDivEle.id = "taskDiv";
+        completedTaskArray.forEach((taskObj,index)=>
+        {
+            const singleTaskDivEle = document.createElement('div');
+            singleTaskDivEle.id = "taskDiv";
 
-        //task text part component
-        const taskTextPart = document.createElement('div');
-        taskTextPart.className = "task-text-part";
-        const taskCheckBox = document.createElement('input');
-        taskCheckBox.type = 'checkbox';
-        taskCheckBox.id = taskObj._id;
+            //task text part component
+            const taskTextPart = document.createElement('div');
+            taskTextPart.className = "task-text-part";
+            const taskCheckBox = document.createElement('input');
+            taskCheckBox.type = 'checkbox';
+            taskCheckBox.id = taskObj._id;
 
-        const taskText = document.createElement('p');
-        taskText.innerHTML = taskObj.description;
+            const taskText = document.createElement('p');
+            taskText.innerHTML = taskObj.description;
 
-        taskTextPart.appendChild(taskCheckBox);
-        taskTextPart.appendChild(taskText);
+            taskTextPart.appendChild(taskCheckBox);
+            taskTextPart.appendChild(taskText);
 
-        // task delete button
-        const taskDeleteBtnEle = document.createElement('button');
-        taskDeleteBtnEle.innerHTML = "delete";
-        taskDeleteBtnEle.id = taskObj._id;      
-        taskDeleteBtnEle.className = "task-delete-button";
+            // task delete button
+            const taskDeleteBtnEle = document.createElement('button');
+            taskDeleteBtnEle.innerHTML = "delete";
+            taskDeleteBtnEle.id = taskObj._id;      
+            taskDeleteBtnEle.className = "task-delete-button";
 
-        //append the taskTextPart and deleteBtn elements to the singleTaskDiv
-        singleTaskDivEle.appendChild(taskTextPart);
-        // singleTaskDivEle.appendChild(taskDeleteBtnEle);
+            //append the taskTextPart and deleteBtn elements to the singleTaskDiv
+            singleTaskDivEle.appendChild(taskTextPart);
+            // singleTaskDivEle.appendChild(taskDeleteBtnEle);
 
-        completeTaskEle.appendChild(singleTaskDivEle);
+            completeTaskEle.appendChild(singleTaskDivEle);
 
-    })
+        })
+    }
 }
 
 
