@@ -21,7 +21,7 @@ the todo list associated to each user is empty everytime the user logs in. (as o
 
 
 
-**Drawbacks:**
+**Incomplete features:**
 
 1. Nothing to update the task once created.
 
@@ -38,18 +38,30 @@ the todo list associated to each user is empty everytime the user logs in. (as o
 
 
 
-TODO APP - version 1
+**TODO APP - version 1  (several upgradations have been made to the version-0 of the TODO APP)**
 
-1. use database.
-2. It will be used to store the user details of those who signed up even after the server stops.
-3. try to save each login session data, so that when the user logs in the next time, they can see what they did in the previous login. 
+1. use database to store the signed up users and their tasks.
 
-4. Add functionality where the user can update the entered task.  When click on the task, it appears in a separate block where it can be modified. It is non-modifiable when as a normal list entry.
+2. It will be used to store the user details of those who signed up.
 
-5. Add a feature to mark a task important using a star symbol. This will store all the important tasks for that particular date.
+3. Saves and displays the user's todo list for the day whenever they login.
 
-6. the TODO list will get refreshed each day. Not after each login. Or I can set the expiration duration of a login to 1 day (this is better).
+4. the TODO list will get refreshed each day. Not after each login.
 
-7. set an expiration duration to the login session stored in teh localStorage along with the token for that session.
+5. Enable 'Enter' key to allow adding elements to the list.
 
-8. Enable 'Enter' key to allow adding elements to the list.
+6. Password hashing a and user verification at signup. (to enhance security)
+
+
+
+
+**Incomplete features:**
+
+1. Unable to update the task details. 
+Functionality where the user can update the entered task.  When click on the task, it appears in a separate block where it can be modified. It is non-modifiable when as a normal list entry.
+
+2. Add a feature to mark a task important using a star symbol. This will store all the important tasks for that particular date.
+
+3. set an expiration duration to the login session stored in teh localStorage along with the token for that session.
+
+4. Nothing to store the login session data so that it can be displayed later on, like the user account details displayed on the side of the todo list.
